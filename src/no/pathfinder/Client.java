@@ -2,7 +2,11 @@ package no.pathfinder;
 
 import no.pathfinder.Graph.GeographicCoordinate;
 import no.pathfinder.Graph.MapGraph;
+import org.openstreetmap.gui.jmapviewer.Coordinate;
+import org.openstreetmap.gui.jmapviewer.JMapViewer;
+import org.openstreetmap.gui.jmapviewer.MapPolygonImpl;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -77,12 +81,16 @@ public class Client {
         System.out.println(skand.distance(0, 4426215)); // 7799071
 
         int[] p = skand.path(347370, 430916);
+        JFrame frame = new JFrame();
+        JMapViewer mapViewer = new JMapViewer();
         for (int i = 1; i < p.length; i++) {
             GeographicCoordinate g1 = skand.vertexValue(p[i-1]);
             GeographicCoordinate g2 = skand.vertexValue(p[i]);
-            if (g1.dist(g2) > 1E4) {
-                System.out.println(g1 + ", " + g2);
-            }
+            Coordinate c1 = new Coordinate(g1.lat(), g1.lon());
+            Coordinate c2 = new Coordinate(g2.lat(), g2.lon());
+            mapViewer.addMapPolygon(new MapPolygonImpl(c1, c2, c2));
         }
+        frame.add(mapViewer);
+        frame.setVisible(true);
     }
 }
