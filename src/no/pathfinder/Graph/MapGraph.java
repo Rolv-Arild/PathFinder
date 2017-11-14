@@ -60,7 +60,13 @@ public class MapGraph<T> extends Graph<GeographicCoordinate, T> {
         return vList.get(end).dist;
     }
 
-
+    /**
+     * Finds the path between two nodes using the A* algorithm.
+     *
+     * @param start the index of the starting vertex.
+     * @param end   the index of the ending vertex.
+     * @return an array containing the indices of the vertices in the path.
+     */
     @Override
     public int[] path(int start, int end) {
         if (start == end) return new int[]{start, end};
