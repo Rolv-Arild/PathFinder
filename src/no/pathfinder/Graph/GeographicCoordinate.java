@@ -3,7 +3,11 @@ package no.pathfinder.Graph;
 import static java.lang.Math.*;
 
 /**
- * Created by Rolv-Arild on 09.11.2017.
+ * A class for storing geographic coordinate info and finding distances between them.
+ *
+ * @author Rolv-Arild
+ * @version 1.0.0
+ * @since 0.2.0
  */
 public class GeographicCoordinate {
 
@@ -12,15 +16,29 @@ public class GeographicCoordinate {
     private final double lat;
     private final double lon;
 
+    /**
+     * Creates a geographic coordinate with the given latitude and longitude.
+     *
+     * @param lat the latitude of this geographic coordinate.
+     * @param lon the longitude of this geographic coordinate.
+     */
     public GeographicCoordinate(double lat, double lon) {
         this.lat = lat;
         this.lon = lon;
     }
 
+    /**
+     * Getter for latitude.
+     * @return the latitude of this geographic coordinate.
+     */
     public double lat() {
         return lat;
     }
 
+    /**
+     * Getter for longitude.
+     * @return the longitude of this geographic coordinate.
+     */
     public double lon() {
         return lon;
     }
@@ -34,17 +52,16 @@ public class GeographicCoordinate {
         return sin*sin;
     }
 
+    /**
+     * Uses Haversine's formula to
+     * @param c the geographic coordinate to find the distance to.
+     * @return the distance from to {@code c} in meters.
+     */
     public double dist(GeographicCoordinate c) {
         double b1 = rad(this.lat);
         double b2 = rad(c.lat);
         double l1 = rad(this.lon);
         double l2 = rad(c.lon);
         return 2 * EARTH_RADIUS * asin(sqrt(sin2(b1, b2) + cos(b1)*cos(b2)*sin2(l1, l2)));
-    }
-
-    public static void main(String[] args) {
-        GeographicCoordinate g1 = new GeographicCoordinate(0.0, 0.0);
-        GeographicCoordinate g2 = new GeographicCoordinate(0.1, 0.1);
-        System.out.println(g1.dist(g2));
     }
 }

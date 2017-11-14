@@ -3,7 +3,11 @@ package no.pathfinder.Graph;
 import java.util.*;
 
 /**
- * Created by Rolv-Arild on 09.11.2017.
+ * A graph class for storing vertices with edges between.
+ *
+ * @author Rolv-Arild Braaten
+ * @version 1.0.0
+ * @since 0.1.0
  */
 public class Graph<V, E> {
 
@@ -11,10 +15,19 @@ public class Graph<V, E> {
 
     protected ArrayList<Vertex> vertices;
 
+    /**
+     * Creates an empty graph.
+     */
     public Graph() {
         this.vertices = new ArrayList<>();
     }
 
+    /**
+     * Creates a graph with the specified number of vertices.
+     * All vertices are given a value of null.
+     *
+     * @param size the number of vertices in the graph.
+     */
     public Graph(int size) {
         this.vertices = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
@@ -22,6 +35,11 @@ public class Graph<V, E> {
         }
     }
 
+    /**
+     * Creates a graph from a list of values.
+     *
+     * @param data the list of values to add to the graph.
+     */
     public Graph(List<V> data) {
         this.vertices = new ArrayList<>(data.size());
         for (V datum : data) {
@@ -29,6 +47,12 @@ public class Graph<V, E> {
         }
     }
 
+    /**
+     * Finds the index of a value in the graph.
+     *
+     * @param val the value to find the index of
+     * @return the index of the first vertex containing {@code val}
+     */
     public int indexOf(V val) {
         for (int i = 0; i < vertices.size(); i++) {
             if (getVertex(i).data.equals(val)) return i;
@@ -50,20 +74,42 @@ public class Graph<V, E> {
         vertices.get(index).data = value;
     }
 
+    /**
+     * Finds the value of the vertex at an index.
+     *
+     * @param index the index of the vertex to find the value of.
+     * @return the value of the vertex at {@code index}
+     */
     public V vertexValue(int index) {
         return getVertex(index).data;
     }
 
-    public void addVertex(V datum) {
+    /**
+     * Adds a vertex to the graph with the specified value.
+     *
+     * @param datum the data of the vertex.
+     * @return the index of the new vertex.
+     */
+    public int addVertex(V datum) {
         vertices.add(new Vertex(datum));
+        return vertices.size()-1;
     }
 
-    public void addVertex() {
-        vertices.add(new Vertex(null));
+    /**
+     * Adds an empty vertex to the graph.
+     *
+     * @return the index of the new vertex.
+     */
+    public int addVertex() {
+        return addVertex(null);
     }
 
-    @SafeVarargs
-    public final void addVertices(V... data) {
+    /**
+     * Adds multiple vertices to the graph.
+     *
+     * @param data a list of the data of the vertices to add.
+     */
+    public final void addVertices(List<V> data) {
         for (V datum : data) {
             addVertex(datum);
         }
@@ -76,22 +122,58 @@ public class Graph<V, E> {
         return null;
     }
 
+    /**
+     * Finds the value of an edge.
+     *
+     * @param startIndex the index of the start vertex.
+     * @param endIndex the index of the end vertex.
+     * @return the value of the edge between the start vertex and end vertex,
+     *         or null if there is no edge.
+     */
     public E edgeValue(int startIndex, int endIndex) {
         return edgeValue(getVertex(startIndex), getVertex(endIndex));
     }
 
+    /**
+     * Adds an edge between two vertices with the specified value and weight.
+     *
+     * @param startIndex the index of the start vertex.
+     * @param endIndex the index of the end vertex.
+     * @param data the value to give the edge.
+     * @param weight the weight of the edge.
+     */
     public void addEdge(int startIndex, int endIndex, E data, long weight) {
         getVertex(startIndex).addEdge(new Edge(data, weight, endIndex));
     }
 
+    /**
+     * Adds an edge between two vertices with no value and the specified weight.
+     *
+     * @param i1 the index of the start vertex.
+     * @param i2 the index of the end vertex.
+     * @param weight the weight of the edge.
+     */
     public void addEdge(int i1, int i2, long weight) {
         addEdge(i1, i2, null, weight);
     }
 
+    /**
+     * Adds an edge between two vertices with the specified value and infinite weight.
+     *
+     * @param i1 the index of the start vertex.
+     * @param i2 the index of the end vertex.
+     * @param data the value to give the edge.
+     */
     public void addEdge(int i1, int i2, E data) {
         addEdge(i1, i2, data, INFINITY);
     }
 
+    /**
+     * Adds an edge between two vertices with no value and infinite weight.
+     *
+     * @param i1 the index of the start vertex.
+     * @param i2 the index of the end vertex.
+     */
     public void addEdge(int i1, int i2) {
         addEdge(i1, i2, null, INFINITY);
     }
@@ -127,6 +209,15 @@ public class Graph<V, E> {
         return false;
     }
 
+    /**
+     * Checks if two vertices are adjacent.
+     * Two vertices are adjacent if there is an edge
+     * going from the first vertex to the second.
+     *
+     * @param startIndex the index of the start vertex.
+     * @param endIndex the index of the end vertex.
+     * @return {@code true} if there is an edge from the start vertex to the end vertex.
+     */
     public boolean adjacent(int startIndex, int endIndex) {
         return adjacent(getVertex(startIndex), getVertex(endIndex));
     }
@@ -154,6 +245,13 @@ public class Graph<V, E> {
         }
     }
 
+    /**
+     * Finds the shortest distance between two vertices using Dijkstra's algorithm.
+     *
+     * @param start the index of the start vertex.
+     * @param end the index of the end vertex.
+     * @return the shortest distance between the start vertex and the end vertex.
+     */
     public long distance(int start, int end) {
         ArrayList<DistanceEntry> vList = new ArrayList<>(vertices.size());
         PriorityQueue<DistanceEntry> Q = new PriorityQueue<>();
@@ -168,6 +266,13 @@ public class Graph<V, E> {
         return vList.get(end).dist;
     }
 
+    /**
+     * Finds the index of the closest vertex with a value equal to a target value.
+     *
+     * @param start the index of the start vertex.
+     * @param target the target value.
+     * @return the index of the closest vertex to {@code start} whose value equals {@code target}.
+     */
     public int closest(int start, V target) {
         ArrayList<DistanceEntry> vList = new ArrayList<>(vertices.size());
         PriorityQueue<DistanceEntry> Q = new PriorityQueue<>();
@@ -435,8 +540,14 @@ public class Graph<V, E> {
         L.push(i);
     }
 
-
-    public int followPath(int startIndex, E... path) {
+    /**
+     * Follows a path through the graph, and returns the resulting index.
+     *
+     * @param startIndex the index of the start vertex.
+     * @param path the path to follow.
+     * @return the index of the resulting index from following {@code path} from the start vertex.
+     */
+    public int followPath(int startIndex, List<E> path) {
         loop:
         for (E e : path) {
             for (Edge edge : getVertex(startIndex).edges) {
@@ -450,10 +561,21 @@ public class Graph<V, E> {
         return startIndex;
     }
 
+    /**
+     * The number of vertices in the graph.
+     *
+     * @return the number of vertices in the graph.
+     */
     public int size() {
         return vertices.size();
     }
 
+    /**
+     * Finds the indexes of all leaf vertices in the graph.
+     * A leaf vertex is a vertex with no outgoing edges.
+     *
+     * @return an array containing indexes of all leaf vertices in the graph.
+     */
     public int[] leafIndexes() {
         ArrayList<Integer> indexes = new ArrayList<>();
         for (int i = 0; i < vertices.size(); i++) {
