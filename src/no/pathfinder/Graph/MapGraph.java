@@ -5,6 +5,7 @@ import java.util.PriorityQueue;
 
 /**
  * A graph to represent intersections with coordinates with roads inbetween.
+ *
  * @author Rolv-Arild Braaten
  * @version 1.0.0
  * @since 0.2.0
@@ -35,7 +36,7 @@ public class MapGraph<T> extends Graph<GeographicCoordinate, T> {
     }
 
     private long heuristic(GeographicCoordinate g1, GeographicCoordinate g2) {
-        return (long) (360000*g1.dist(g2)/10.0); // time to drive straight distance at 10km/h
+        return (long) (3.6*g1.dist(g2)/110.0); // time to drive straight distance at 110km/h
     }
 
     /**
@@ -126,7 +127,8 @@ public class MapGraph<T> extends Graph<GeographicCoordinate, T> {
         @Override
         public int compareTo(DistanceEntry o) {
             MapDistanceEntry m = (MapDistanceEntry) o;
-            return Long.compare(this.fScore, m.fScore);
+            int comp = Long.compare(this.fScore, m.fScore);
+            return (comp == 0) ? super.compareTo(m) : comp;
         }
     }
 }

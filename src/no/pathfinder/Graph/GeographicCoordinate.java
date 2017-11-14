@@ -64,4 +64,9 @@ public class GeographicCoordinate {
         double l2 = rad(c.lon);
         return 2 * EARTH_RADIUS * asin(sqrt(sin2(b1, b2) + cos(b1)*cos(b2)*sin2(l1, l2)));
     }
+
+    @Override
+    public String toString() {
+        return "(" + lat + "," + lon + ")";
+    }
 }

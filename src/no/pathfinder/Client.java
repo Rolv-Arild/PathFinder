@@ -65,15 +65,24 @@ public class Client {
 
         long time = System.nanoTime();
         long a = skand.Dijkstrance(347370, 430916);
-        System.out.println("Dijkstra: " + (System.nanoTime()-time));
+        System.out.println("Dijkstra: " + (System.nanoTime()-time)/1E9);
 
         time = System.nanoTime();
         long b = skand.distance(347370, 430916);
-        System.out.println("A*: " + (System.nanoTime()-time));
+        System.out.println("A*: " + (System.nanoTime()-time)/1E9);
 
         System.out.println("Finding distance...");
         System.out.println(skand.distance(37774, 18058)); // 31552
         System.out.println(skand.distance(347370, 430916)); // 2226149
         System.out.println(skand.distance(0, 4426215)); // 7799071
+
+        int[] p = skand.path(347370, 430916);
+        for (int i = 1; i < p.length; i++) {
+            GeographicCoordinate g1 = skand.vertexValue(p[i-1]);
+            GeographicCoordinate g2 = skand.vertexValue(p[i]);
+            if (g1.dist(g2) > 1E4) {
+                System.out.println(g1 + ", " + g2);
+            }
+        }
     }
 }
