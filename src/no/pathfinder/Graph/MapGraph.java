@@ -60,6 +60,38 @@ public class MapGraph<T> extends Graph<GeographicCoordinate, T> {
         return vList.get(end).dist;
     }
 
+
+    @Override
+    public int[] path(int start, int end) {
+        if (start == end) return new int[]{start, end};
+        ArrayList<MapDistanceEntry> vList = new ArrayList<>(vertices.size());
+        PriorityQueue<MapDistanceEntry> Q = new PriorityQueue<>();
+
+        fill(vList, Q, start);
+
+        while (!Q.isEmpty()) {
+            MapDistanceEntry u = Q.remove();
+            if (u.index == end || u.dist == INFINITY) break;
+            visitVertices(vList, Q, u, end);
+        }
+        MapDistanceEntry v = vList.get(end);
+        if (v.dist == INFINITY) return null;
+        int[] path = new int[Math.toIntExact(v.dist + 1)]; // max number of vertices
+
+        int i = 0;
+        while (v.prev != null) {
+            path[i] = v.index;
+            v = (MapDistanceEntry) v.prev;
+            i++;
+        }
+        int[] path2 = new int[i + 1];
+        for (int j = 0; j < path2.length; j++) {
+            path2[i - j] = path[j];
+        }
+        path2[0] = start;
+        return path2;
+    }
+
     /**
      * Finds the shortest distance between two places using Dijkstra's algorithm.
      *

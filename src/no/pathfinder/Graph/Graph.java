@@ -479,7 +479,7 @@ public class Graph<V, E> {
      * @param end   the index of the ending vertex.
      * @return an array containing the indices of the vertices in the path.
      */
-    public int[] Dijkstra(int start, int end) {
+    public int[] path(int start, int end) {
         if (start == end) return new int[]{start, end};       
         ArrayList<DistanceEntry> vList = new ArrayList<>(vertices.size());
         PriorityQueue<DistanceEntry> Q = new PriorityQueue<>();
