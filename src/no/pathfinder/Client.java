@@ -60,6 +60,10 @@ public class Client {
             graph.addEdge(numbers[0], numbers[1], numbers[2]);
         }
 
+        brN.close();
+        brE.close();
+        frN.close();
+        frE.close();
         return graph;
     }
 
@@ -125,6 +129,7 @@ public class Client {
         mapViewer.setDisplayToFitMapMarkers();
         frame.add(mapViewer);
         frame.pack();
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
 }
