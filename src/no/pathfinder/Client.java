@@ -58,6 +58,10 @@ public class Client {
             graph.addEdge(numbers[0], numbers[1], numbers[2]);
         }
 
+        brN.close();
+        brE.close();
+        frN.close();
+        frE.close();
         return graph;
     }
 
