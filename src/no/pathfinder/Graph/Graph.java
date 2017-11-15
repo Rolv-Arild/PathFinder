@@ -6,7 +6,7 @@ import java.util.*;
  * A graph class for storing vertices with edges between.
  *
  * @author Rolv-Arild Braaten
- * @version 1.0.0
+ * @version 1.1.0
  * @since 0.1.0
  */
 public class Graph<V, E> {

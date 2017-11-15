@@ -6,7 +6,7 @@ import static java.lang.Math.*;
  * A class for storing geographic coordinate info and finding distances between them.
  *
  * @author Rolv-Arild
- * @version 1.0.0
+ * @version 1.1.0
  * @since 0.2.0
  */
 public class GeographicCoordinate {

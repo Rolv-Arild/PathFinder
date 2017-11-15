@@ -7,7 +7,7 @@ import java.util.PriorityQueue;
  * A graph to represent intersections with coordinates with roads inbetween.
  *
  * @author Rolv-Arild Braaten
- * @version 1.0.0
+ * @version 1.1.0
  * @since 0.2.0
  */
 public class MapGraph<T> extends Graph<GeographicCoordinate, T> {

@@ -7,6 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -53,19 +54,16 @@ public class Client extends Application {
             brN.readLine(); // first line contains number of nodes
             String ns;
             while ((ns = brN.readLine()) != null) {
-                double[] numbers = new double[3];
+                double[] numbers = new double[2];
                 int c = 0;
                 for (int i = 0; i < ns.length(); i++) {
-                    if (ns.charAt(i) != ' ') {
-                        if (Character.isDigit(ns.charAt(i))) {
-                            numbers[c] *= 10;
-                            numbers[c] += Integer.parseInt(String.valueOf(ns.charAt(i)));
-                        }
-                    } else if (i > 0 && ns.charAt(i - 1) != ' ') {
+                    if (ns.charAt(i) == '.') {
+                        numbers[c] = Double.parseDouble(ns.substring(i-3, i+8));
+                        i += 8;
                         c++;
                     }
                 }
-                graph.addVertex(new GeographicCoordinate(numbers[1] / 1E7, numbers[2] / 1E7));
+                graph.addVertex(new GeographicCoordinate(numbers[0], numbers[1]));
             }
 
             brE.readLine(); // first line contains number of edges
@@ -74,13 +72,12 @@ public class Client extends Application {
                 int[] numbers = new int[3];
                 int c = 0;
                 for (int i = 0; i < es.length(); i++) {
-                    if (Character.isDigit(es.charAt(i))) {
-                        numbers[c] *= 10;
-                        numbers[c] += Integer.parseInt(String.valueOf(es.charAt(i)));
-                    } else if (i > 0 && es.charAt(i - 1) != ' ') {
-                        c++;
-                        if (c == 3) break;
-                    }
+                    int index = 1;
+                    while (Character.isDigit(es.charAt(i+index))) index++;
+                    numbers[c] = Integer.parseInt(es.substring(i, i+index));
+                    i += index;
+                    c++;
+                    if (c == numbers.length) break;
                 }
                 graph.addEdge(numbers[0], numbers[1], numbers[2]);
             }
@@ -220,10 +217,12 @@ public class Client extends Application {
         node.setContent(mapViewer);
         grid.add(node, 0, 2, 4, 4);
 
+
         button.onActionProperty().setValue(event -> {
             synchronized (mapViewer) {
                 assert places != null;
                 assert skand != null;
+                result.setText("Loading...");
                 Integer i1;
                 try {
                     i1 = Integer.parseInt(text1.getText());
@@ -236,8 +235,10 @@ public class Client extends Application {
                 } catch (NumberFormatException e) {
                     i2 = places.get(text2.getText());
                 }
-                if (i1 == null || i2 == null) {
-                    result.setText("Invalid");
+                if (i1 == null) {
+                    result.setText("Invalid: " + text1.getText() + ((i2 == null) ? ", " + text2.getText() : ""));
+                } else if (i2 == null) {
+                    result.setText("Invalid: " + text2.getText());
                 } else {
                     showPath(i1, i2, mapViewer);
                     result.setText(timeString(skand.distance(i1, i2)));
@@ -245,6 +246,12 @@ public class Client extends Application {
             }
         });
 
+        text1.onKeyPressedProperty().setValue(event -> {
+            if (event.getCode().equals(KeyCode.ENTER)) {
+                button.fire();
+            }
+        });
+        text2.onKeyPressedProperty().setValue(text1.getOnKeyPressed());
 
         Scene scene = new Scene(grid, 1920, 1080);
 
