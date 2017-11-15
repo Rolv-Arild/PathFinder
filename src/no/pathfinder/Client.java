@@ -109,9 +109,14 @@ public class Client extends Application {
                 if (s1.matches("\\d+\\s*")) {
                     index = Integer.parseInt(s1.trim());
                 } else {
-                    if (!map.containsKey(s1) && index >= 0) {
-                        map.put(s1, index);
+                    if (index < 0) continue;
+                    String s2 = s1;
+                    int i = 1;
+                    while (map.containsKey(s2)) {
+                        s2 = s1+i;
+                        i++;
                     }
+                    map.put(s2, index);
                 }
             }
         }
@@ -127,14 +132,18 @@ public class Client extends Application {
     public static void main(String[] args) throws IOException {
 //        nodeMap();
         if (skand == null) throw new NullPointerException("asdasd");
+
+        // GUI launcher
         launch(args);
         System.exit(0);
+
+        // Testing against Dijkstra
         long time = System.nanoTime();
-        long b = skand.distance(380829, 318102);
+        long b = skand.distance(347370, 143917);
         System.out.println("A*: " + (System.nanoTime()-time)/1E9);
 
         time = System.nanoTime();
-        long a = skand.Dijkstrance(380829, 318102);
+        long a = skand.Dijkstrance(347370, 143917);
         System.out.println("Dijkstra: " + (System.nanoTime()-time)/1E9);
 
         if (a != b) System.out.println("Error: " + a + " != " + b);
