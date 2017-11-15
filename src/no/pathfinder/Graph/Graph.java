@@ -452,7 +452,7 @@ public class Graph<V, E> {
      * @param start the starting node.
      * @return an array containing the distances to every vertex in the graph.
      */
-    public long[] Dijkstra(int start) {
+    public long[] distances(int start) {
         ArrayList<DistanceEntry> vList = new ArrayList<>(vertices.size());
         PriorityQueue<DistanceEntry> Q = new PriorityQueue<>();
 
@@ -469,6 +469,25 @@ public class Graph<V, E> {
             dist[i] = vList.get(i).dist;
         }
         return dist;
+    }
+
+    /**
+     * Finds the index of the vertex that is furthest away from the starting vertex.
+     *
+     * @param start the index of the starting vertex.
+     * @return the index of the vertex furthest from the starting vertex.
+     */
+    public int furthestPoint(int start) {
+        long[] dist = distances(start);
+        long max = 0;
+        int maxI = -1;
+        for (int i = 0; i < dist.length; i++) {
+            if (dist[i] > max && dist[i] != INFINITY) {
+                max = dist[i];
+                maxI = i;
+            }
+        }
+        return maxI;
     }
 
 

@@ -110,7 +110,6 @@ public class MapGraph<T> extends Graph<GeographicCoordinate, T> {
         return super.distance(start, end);
     }
 
-
     private class MapDistanceEntry extends DistanceEntry {
         
         long fScore = INFINITY;

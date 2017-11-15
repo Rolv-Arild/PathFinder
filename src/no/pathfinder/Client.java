@@ -25,7 +25,8 @@ public class Client {
 
         MapGraph<Integer> graph = new MapGraph<>();
 
-        String ns = brN.readLine();
+        brN.readLine(); // first line contains number of nodes
+        String ns;
         while ((ns = brN.readLine()) != null) {
             double[] numbers = new double[3];
             int c = 0;
@@ -42,7 +43,8 @@ public class Client {
             graph.addVertex(new GeographicCoordinate(numbers[1] / 1E7, numbers[2] / 1E7));
         }
 
-        String es = brE.readLine();
+        brE.readLine(); // first line contains number of edges
+        String es;
         while ((es = brE.readLine()) != null) {
             int[] numbers = new int[3];
             int c = 0;
@@ -86,7 +88,23 @@ public class Client {
         System.out.println(skand.distance(347370, 430916)); // 2226149
         System.out.println(skand.distance(0, 4426215)); // 7799071
 
-        int[] p = skand.path(380829, 318102);
+
+
+        int now = 0;
+        int last1 = 0;
+        int last2;
+        do {
+            last2 = last1;
+            last1 = now;
+            now = skand.furthestPoint(now);
+            System.out.println(now);
+        } while (last2 != now);
+        System.out.println(now + ", " + last1);
+
+
+
+
+        int[] p = skand.path(now, last1);
         JFrame frame = new JFrame();
         JMapViewer mapViewer = new JMapViewer();
         GeographicCoordinate g = skand.vertexValue(p[0]);
