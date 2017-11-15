@@ -107,6 +107,7 @@ public class Client {
         mapViewer.setDisplayToFitMapMarkers();
         frame.add(mapViewer);
         frame.pack();
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
 }
