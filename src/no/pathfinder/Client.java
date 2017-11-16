@@ -12,6 +12,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import no.pathfinder.Graph.GeographicCoordinate;
+import no.pathfinder.Graph.MapDistanceEntry;
 import no.pathfinder.Graph.MapGraph;
 import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
@@ -136,20 +137,20 @@ public class Client extends Application {
 
         // Testing against Dijkstra
         long time = System.nanoTime();
-        long b = skand.distance(347370, 143917);
+        long b = skand.AStar(347370, 143917).getWeight();
         System.out.println("A*: " + (System.nanoTime()-time)/1E9);
 
         time = System.nanoTime();
-        long a = skand.Dijkstrance(347370, 143917);
+        long a = skand.Dijkstra(347370, 143917).getWeight();
         System.out.println("Dijkstra: " + (System.nanoTime()-time)/1E9);
 
         if (a != b) System.out.println("Error: " + a + " != " + b);
         else System.out.println(a);
 
         System.out.println("Finding distance...");
-        System.out.println(skand.distance(37774, 18058)); // 31552
-        System.out.println(skand.distance(347370, 430916)); // 2226149
-        System.out.println(skand.distance(0, 4426215)); // 7799071
+        System.out.println(skand.AStar(37774, 18058)); // 31552
+        System.out.println(skand.AStar(347370, 430916)); // 2226149
+        System.out.println(skand.AStar(0, 4426215)); // 7799071
 
 
 
@@ -164,28 +165,26 @@ public class Client extends Application {
         } while (last2 != now);
         System.out.println(now + ", " + last1); // 1537587, 1557335
 
-        long di1 = skand.distance(now, last1);
-        long di2 = skand.Dijkstrance(now, last1);
+        long di1 = skand.AStar(now, last1).getWeight();
+        long di2 = skand.Dijkstra(now, last1).getWeight();
         System.out.println(di1 + ", " + di2 + ", " + (di1 == di2));
     }
 
-    private static void showPath(int start, int end, JMapViewer mapViewer) {
+    private static void showPath(MapDistanceEntry mde, JMapViewer mapViewer) {
         mapViewer.removeAllMapMarkers();
         mapViewer.removeAllMapPolygons();
         assert skand != null;
-        int[] p = skand.path(start, end);
-        GeographicCoordinate g = skand.vertexValue(start);
+        GeographicCoordinate g = skand.vertexValue(mde.getStart());
         mapViewer.addMapMarker(new MapMarkerDot(g.lat(), g.lon()));
-        if (p != null) {
-            for (int i = 1; i < p.length; i++) {
-                GeographicCoordinate g1 = skand.vertexValue(p[i - 1]);
-                GeographicCoordinate g2 = skand.vertexValue(p[i]);
-                Coordinate c1 = new Coordinate(g1.lat(), g1.lon());
-                Coordinate c2 = new Coordinate(g2.lat(), g2.lon());
-                mapViewer.addMapPolygon(new MapPolygonImpl(c1, c2, c2));
-            }
+        int[] p = mde.getPath();
+        for (int i = 1; i < p.length; i++) {
+            GeographicCoordinate g1 = skand.vertexValue(p[i - 1]);
+            GeographicCoordinate g2 = skand.vertexValue(p[i]);
+            Coordinate c1 = new Coordinate(g1.lat(), g1.lon());
+            Coordinate c2 = new Coordinate(g2.lat(), g2.lon());
+            mapViewer.addMapPolygon(new MapPolygonImpl(c1, c2, c2));
         }
-        GeographicCoordinate h = skand.vertexValue(end);
+        GeographicCoordinate h = skand.vertexValue(mde.getIndex());
         mapViewer.addMapMarker(new MapMarkerDot(h.lat(), h.lon()));
         mapViewer.setDisplayToFitMapMarkers();
     }
@@ -240,8 +239,9 @@ public class Client extends Application {
                 } else if (i2 == null) {
                     result.setText("Invalid: " + text2.getText());
                 } else {
-                    showPath(i1, i2, mapViewer);
-                    result.setText(timeString(skand.distance(i1, i2)));
+                    MapDistanceEntry mde = skand.AStar(i1, i2);
+                    showPath(mde, mapViewer);
+                    result.setText(timeString(mde.getWeight()));
                 }
             }
         });

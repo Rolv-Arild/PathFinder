@@ -11,7 +11,7 @@ import java.util.*;
  */
 public class Graph<V, E> {
 
-    protected static final long INFINITY = Long.MAX_VALUE;
+    public static final long INFINITY = Long.MAX_VALUE;
 
     protected ArrayList<Vertex> vertices;
 
@@ -225,7 +225,7 @@ public class Graph<V, E> {
 
     private void fill(ArrayList<DistanceEntry> vList, PriorityQueue<DistanceEntry> Q, int start) {
         for (int i = 0; i < vertices.size(); i++) {
-            DistanceEntry v = new DistanceEntry(i);
+            DistanceEntry v = new DistanceEntry(i, start);
             if (i == start) {
                 v.update(0, null);
                 Q.add(v);
@@ -236,9 +236,9 @@ public class Graph<V, E> {
 
     private void visitVertices(ArrayList<DistanceEntry> vList, PriorityQueue<DistanceEntry> Q, DistanceEntry v) {
         for (Edge n : getVertex(v.index).edges) {
-            long alt = v.dist + n.weight;
+            long alt = v.weight + n.weight;
             DistanceEntry to = vList.get(n.toIndex);
-            if (alt < to.dist) {
+            if (alt < to.weight) {
                 to.update(alt, v);
                 Q.add(to);
             }
@@ -252,7 +252,7 @@ public class Graph<V, E> {
      * @param end the index of the end vertex.
      * @return the shortest distance between the start vertex and the end vertex.
      */
-    public long distance(int start, int end) {
+    public DistanceEntry Dijkstra(int start, int end) {
         ArrayList<DistanceEntry> vList = new ArrayList<>(vertices.size());
         PriorityQueue<DistanceEntry> Q = new PriorityQueue<>();
 
@@ -260,10 +260,10 @@ public class Graph<V, E> {
 
         while (!Q.isEmpty()) {
             DistanceEntry u = Q.remove();
-            if (u.index == end || u.dist == INFINITY) break;
+            if (u.index == end || u.weight == INFINITY) break;
             visitVertices(vList, Q, u);
         }
-        return vList.get(end).dist;
+        return vList.get(end);
     }
 
     /**
@@ -282,7 +282,7 @@ public class Graph<V, E> {
         while (!Q.isEmpty()) {
             DistanceEntry u = Q.remove();
             if (getVertex(u.index).data.equals(target)) return u.index;
-            if (u.dist == INFINITY) break;
+            if (u.weight == INFINITY) break;
             visitVertices(vList, Q, u);
         }
         return -1;
@@ -460,13 +460,13 @@ public class Graph<V, E> {
 
         while (!Q.isEmpty()) {
             DistanceEntry u = Q.remove();
-            if (u.dist == INFINITY) break;
+            if (u.weight == INFINITY) break;
             visitVertices(vList, Q, u);
         }
         long[] dist = new long[vertices.size()];
 
         for (int i = 0; i < vList.size(); i++) {
-            dist[i] = vList.get(i).dist;
+            dist[i] = vList.get(i).weight;
         }
         return dist;
     }
@@ -490,43 +490,6 @@ public class Graph<V, E> {
         return maxI;
     }
 
-
-    /**
-     * Finds the path between two nodes using Dijkstra's algorithm.
-     *
-     * @param start the index of the starting vertex.
-     * @param end   the index of the ending vertex.
-     * @return an array containing the indices of the vertices in the path.
-     */
-    public int[] path(int start, int end) {
-        if (start == end) return new int[]{start, end};       
-        ArrayList<DistanceEntry> vList = new ArrayList<>(vertices.size());
-        PriorityQueue<DistanceEntry> Q = new PriorityQueue<>();
-
-        fill(vList, Q, start);
-
-        while (!Q.isEmpty()) {
-            DistanceEntry u = Q.remove();
-            if (u.index == end || u.dist == INFINITY) break;
-            visitVertices(vList, Q, u);
-        }
-        DistanceEntry v = vList.get(end);
-        if (v.dist == INFINITY) return null;
-        int[] path = new int[Math.toIntExact(v.dist + 1)]; // max number of vertices
-        
-        int i = 0;
-        while (v.prev != null) {
-            path[i] = v.index;
-            v = v.prev;
-            i++;
-        }
-        int[] path2 = new int[i + 1];
-        for (int j = 0; j < path2.length; j++) {
-            path2[i - j] = path[j];
-        }
-        path2[0] = start;
-        return path2;
-    }
 
     /**
      * Sorts the graph topologically.
@@ -631,31 +594,6 @@ public class Graph<V, E> {
             this.data = data;
             this.weight = weight;
             this.toIndex = toIndex;
-        }
-    }
-
-    protected class DistanceEntry implements Comparable<DistanceEntry> {
-        int index;
-        long dist = INFINITY;
-        DistanceEntry prev = null;
-
-        DistanceEntry(int index) {
-            this.index = index;
-        }
-
-        void update(long dist, DistanceEntry prev) {
-            this.dist = dist;
-            this.prev = prev;
-        }
-
-        @Override
-        public int compareTo(DistanceEntry o) {
-            return Long.compare(dist, o.dist);
-        }
-
-        @Override
-        public String toString() {
-            return String.valueOf(index);
         }
     }
 }
