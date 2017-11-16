@@ -148,10 +148,9 @@ public class Client extends Application {
         else System.out.println(a);
 
         System.out.println("Finding distance...");
-        System.out.println(skand.AStar(37774, 18058)); // 31552
-        System.out.println(skand.AStar(347370, 430916)); // 2226149
-        System.out.println(skand.AStar(0, 4426215)); // 7799071
-
+        System.out.println("Kalvskinnet-Moholt: " + skand.AStar(37774, 18058)); // Dijkstra: 31552
+        System.out.println("Trondheim-Mo i Rana: " + skand.AStar(347370, 430916)); // Dijkstra: 2226149
+        System.out.println("0-4426215: " + skand.AStar(0, 4426215)); // Dijkstra: 7799071
 
 
         int now = 123456;
@@ -168,6 +167,7 @@ public class Client extends Application {
         long di1 = skand.AStar(now, last1).getWeight();
         long di2 = skand.Dijkstra(now, last1).getWeight();
         System.out.println(di1 + ", " + di2 + ", " + (di1 == di2));
+        System.exit(0);
     }
 
     private static void showPath(MapDistanceEntry mde, JMapViewer mapViewer) {
@@ -175,7 +175,9 @@ public class Client extends Application {
         mapViewer.removeAllMapPolygons();
         assert skand != null;
         GeographicCoordinate g = skand.vertexValue(mde.getStart());
-        mapViewer.addMapMarker(new MapMarkerDot(g.lat(), g.lon()));
+        MapMarkerDot mmd1 = new MapMarkerDot(g.lat(), g.lon());
+        mmd1.setBackColor(Color.GREEN);
+        mapViewer.addMapMarker(mmd1);
         int[] p = mde.getPath();
         for (int i = 1; i < p.length; i++) {
             GeographicCoordinate g1 = skand.vertexValue(p[i - 1]);
@@ -185,8 +187,10 @@ public class Client extends Application {
             mapViewer.addMapPolygon(new MapPolygonImpl(c1, c2, c2));
         }
         GeographicCoordinate h = skand.vertexValue(mde.getIndex());
-        mapViewer.addMapMarker(new MapMarkerDot(h.lat(), h.lon()));
-        mapViewer.setDisplayToFitMapMarkers();
+        MapMarkerDot mmd2 = new MapMarkerDot(h.lat(), h.lon());
+        mmd2.setBackColor(Color.RED);
+        mapViewer.addMapMarker(mmd2);
+        if (!h.equals(g)) mapViewer.setDisplayToFitMapMarkers();
     }
 
     @Override

@@ -69,4 +69,12 @@ public class GeographicCoordinate {
     public String toString() {
         return "(" + lat + "," + lon + ")";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GeographicCoordinate that = (GeographicCoordinate) o;
+        return Double.compare(that.lat, lat) == 0 && Double.compare(that.lon, lon) == 0;
+    }
 }

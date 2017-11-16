@@ -125,57 +125,57 @@ public class Graph<V, E> {
     /**
      * Finds the value of an edge.
      *
-     * @param startIndex the index of the start vertex.
-     * @param endIndex the index of the end vertex.
+     * @param start the index of the start vertex.
+     * @param end the index of the end vertex.
      * @return the value of the edge between the start vertex and end vertex,
      *         or null if there is no edge.
      */
-    public E edgeValue(int startIndex, int endIndex) {
-        return edgeValue(getVertex(startIndex), getVertex(endIndex));
+    public E edgeValue(int start, int end) {
+        return edgeValue(getVertex(start), getVertex(end));
     }
 
     /**
      * Adds an edge between two vertices with the specified value and weight.
      *
-     * @param startIndex the index of the start vertex.
-     * @param endIndex the index of the end vertex.
+     * @param start the index of the start vertex.
+     * @param end the index of the end vertex.
      * @param data the value to give the edge.
      * @param weight the weight of the edge.
      */
-    public void addEdge(int startIndex, int endIndex, E data, long weight) {
-        getVertex(startIndex).addEdge(new Edge(data, weight, endIndex));
+    public void addEdge(int start, int end, E data, long weight) {
+        getVertex(start).addEdge(new Edge(data, weight, end));
     }
 
     /**
      * Adds an edge between two vertices with no value and the specified weight.
      *
-     * @param i1 the index of the start vertex.
-     * @param i2 the index of the end vertex.
+     * @param start the index of the start vertex.
+     * @param end the index of the end vertex.
      * @param weight the weight of the edge.
      */
-    public void addEdge(int i1, int i2, long weight) {
-        addEdge(i1, i2, null, weight);
+    public void addEdge(int start, int end, long weight) {
+        addEdge(start, end, null, weight);
     }
 
     /**
      * Adds an edge between two vertices with the specified value and infinite weight.
      *
-     * @param i1 the index of the start vertex.
-     * @param i2 the index of the end vertex.
+     * @param start the index of the start vertex.
+     * @param end the index of the end vertex.
      * @param data the value to give the edge.
      */
-    public void addEdge(int i1, int i2, E data) {
-        addEdge(i1, i2, data, INFINITY);
+    public void addEdge(int start, int end, E data) {
+        addEdge(start, end, data, INFINITY);
     }
 
     /**
      * Adds an edge between two vertices with no value and infinite weight.
      *
-     * @param i1 the index of the start vertex.
-     * @param i2 the index of the end vertex.
+     * @param start the index of the start vertex.
+     * @param end the index of the end vertex.
      */
-    public void addEdge(int i1, int i2) {
-        addEdge(i1, i2, null, INFINITY);
+    public void addEdge(int start, int end) {
+        addEdge(start, end, null, INFINITY);
     }
 
     private Edge getEdge(Vertex start, Vertex end) {
@@ -185,8 +185,8 @@ public class Graph<V, E> {
         return null;
     }
 
-    private Edge getEdge(int startIndex, int endIndex) {
-        return getEdge(getVertex(startIndex), getVertex(endIndex));
+    private Edge getEdge(int start, int end) {
+        return getEdge(getVertex(start), getVertex(end));
     }
 
     private E removeEdge(Vertex start, Vertex end) {
@@ -198,9 +198,10 @@ public class Graph<V, E> {
         return null;
     }
 
-    private E removeEdge(int startIndex, int endIndex) {
-        return removeEdge(getVertex(startIndex), getVertex(endIndex));
+    private E removeEdge(int start, int end) {
+        return removeEdge(getVertex(start), getVertex(end));
     }
+
 
     private boolean adjacent(Vertex start, Vertex end) {
         for (Edge edge : start.edges) {
@@ -214,15 +215,31 @@ public class Graph<V, E> {
      * Two vertices are adjacent if there is an edge
      * going from the first vertex to the second.
      *
-     * @param startIndex the index of the start vertex.
-     * @param endIndex the index of the end vertex.
+     * @param start the index of the start vertex.
+     * @param end the index of the end vertex.
      * @return {@code true} if there is an edge from the start vertex to the end vertex.
      */
-    public boolean adjacent(int startIndex, int endIndex) {
-        return adjacent(getVertex(startIndex), getVertex(endIndex));
+    public boolean adjacent(int start, int end) {
+        return adjacent(getVertex(start), getVertex(end));
     }
 
+    /**
+     * Returns an array of indices for all adjacent vertices.
+     * @param start the index of the start vertex.
+     * @return an array of indices for all adjacent vertices to the start vertex.
+     */
+    public int[] adjacent(int start) {
+        LinkedList<Edge> a = getVertex(start).edges;
+        int[] adj = new int[a.size()];
+        int i = 0;
+        for (Edge edge : a) { // indexed for loop is inefficient for linked list
+            adj[i] = edge.toIndex;
+            i++;
+        }
+        return adj;
+    }
 
+    /* Helper method for Dijkstra */
     private void fill(ArrayList<DistanceEntry> vList, PriorityQueue<DistanceEntry> Q, int start) {
         for (int i = 0; i < vertices.size(); i++) {
             DistanceEntry v = new DistanceEntry(i, start);
@@ -234,6 +251,7 @@ public class Graph<V, E> {
         }
     }
 
+    /* Helper method for Dijkstra */
     private void visitVertices(ArrayList<DistanceEntry> vList, PriorityQueue<DistanceEntry> Q, DistanceEntry v) {
         for (Edge n : getVertex(v.index).edges) {
             long alt = v.weight + n.weight;
@@ -258,11 +276,14 @@ public class Graph<V, E> {
 
         fill(vList, Q, start);
 
+        int c = 0;
         while (!Q.isEmpty()) {
             DistanceEntry u = Q.remove();
+            c++;
             if (u.index == end || u.weight == INFINITY) break;
             visitVertices(vList, Q, u);
         }
+//        System.out.println(c);
         return vList.get(end);
     }
 
@@ -525,22 +546,22 @@ public class Graph<V, E> {
     /**
      * Follows a path through the graph, and returns the resulting index.
      *
-     * @param startIndex the index of the start vertex.
+     * @param start the index of the start vertex.
      * @param path the path to follow.
      * @return the index of the resulting index from following {@code path} from the start vertex.
      */
-    public int followPath(int startIndex, List<E> path) {
+    public int followPath(int start, List<E> path) {
         loop:
         for (E e : path) {
-            for (Edge edge : getVertex(startIndex).edges) {
+            for (Edge edge : getVertex(start).edges) {
                 if (edge.data.equals(e)) {
-                    startIndex = edge.toIndex;
+                    start = edge.toIndex;
                     continue loop;
                 }
             }
             return -1;
         }
-        return startIndex;
+        return start;
     }
 
     /**

@@ -11,8 +11,8 @@ import static no.pathfinder.Graph.Graph.INFINITY;
  */
 public class MapDistanceEntry extends DistanceEntry {
 
-    long fScore = INFINITY;
-    Road road;
+    private long fScore = INFINITY;
+//    Road road; // may come in handy later
 
     MapDistanceEntry(int index, int start) {
         super(index, start);
@@ -21,10 +21,6 @@ public class MapDistanceEntry extends DistanceEntry {
     void update(long time, DistanceEntry prev, long fScore) {
         super.update(time, prev);
         this.fScore = fScore;
-    }
-
-    void setRoad(Road road) {
-        this.road = road;
     }
 
     @Override

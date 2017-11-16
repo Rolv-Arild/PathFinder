@@ -51,11 +51,14 @@ public class MapGraph<T> extends Graph<GeographicCoordinate, T> {
 
         fill(vList, Q, start);
 
+        int c = 0;
         while (!Q.isEmpty()) {
             MapDistanceEntry u = Q.remove();
+            c++;
             if (u.index == end || u.weight == INFINITY) break;
             visitVertices(vList, Q, u, end);
         }
+//        System.out.println(c);
         return vList.get(end);
     }
 }
