@@ -11,8 +11,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import no.pathfinder.Graph.DistanceEntry;
 import no.pathfinder.Graph.GeographicCoordinate;
-import no.pathfinder.Graph.MapDistanceEntry;
 import no.pathfinder.Graph.MapGraph;
 import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
@@ -170,7 +170,7 @@ public class Client extends Application {
         System.exit(0);
     }
 
-    private static void showPath(MapDistanceEntry mde, JMapViewer mapViewer) {
+    private static void showPath(DistanceEntry mde, JMapViewer mapViewer) {
         mapViewer.removeAllMapMarkers();
         mapViewer.removeAllMapPolygons();
         assert skand != null;
@@ -199,7 +199,8 @@ public class Client extends Application {
 
         TextField text2 = new TextField("end");
 
-        Button button = new Button("Find path");
+        Button AStar = new Button("A*");
+        Button Dijkstra = new Button("Dijkstra");
 
         Text result = new Text();
 
@@ -211,8 +212,9 @@ public class Client extends Application {
 
         grid.add(text1, 1, 0);
         grid.add(text2, 2, 0);
-        grid.add(button, 1, 1);
-        grid.add(result, 2, 1);
+        grid.add(AStar, 1, 1);
+        grid.add(Dijkstra, 2, 1);
+        grid.add(result, 3, 1);
 
         JMapViewer mapViewer = new JMapViewer();
         mapViewer.setPreferredSize(new Dimension(1000, 1000));
@@ -221,38 +223,54 @@ public class Client extends Application {
         grid.add(node, 0, 2, 4, 4);
 
 
-        button.onActionProperty().setValue(event -> {
+        AStar.onActionProperty().setValue(event -> {
             synchronized (mapViewer) {
                 assert places != null;
                 assert skand != null;
                 result.setText("Loading...");
+                String s1 = text1.getText();
+                String s2 = text2.getText();
+
                 Integer i1;
-                try {
-                    i1 = Integer.parseInt(text1.getText());
-                } catch (NumberFormatException e) {
-                    i1 = places.get(text1.getText());
+                if (s1.matches("\\d+")) {
+                    i1 = Integer.parseInt(s1);
+                    if (i1 >= skand.size()) i1 = null;
+                } else {
+                    i1 = places.get(s1);
                 }
                 Integer i2;
-                try {
-                    i2 = Integer.parseInt(text2.getText());
-                } catch (NumberFormatException e) {
-                    i2 = places.get(text2.getText());
+                if (s2.matches("[0-9]+")) {
+                    i2 = Integer.parseInt(s2);
+                    if (i2 >= skand.size()) i2 = null;
+                } else {
+                    i2 = places.get(s2);
                 }
                 if (i1 == null) {
-                    result.setText("Invalid: " + text1.getText() + ((i2 == null) ? ", " + text2.getText() : ""));
+                    result.setText("Invalid: " + s1 + ((i2 == null) ? ", " + s2 : ""));
                 } else if (i2 == null) {
-                    result.setText("Invalid: " + text2.getText());
+                    result.setText("Invalid: " + s2);
                 } else {
-                    MapDistanceEntry mde = skand.AStar(i1, i2);
-                    showPath(mde, mapViewer);
-                    result.setText(timeString(mde.getWeight()));
+                    long time = System.nanoTime();
+                    DistanceEntry de;
+                    if (event.getSource() == Dijkstra) {
+                        de = skand.Dijkstra(i1, i2);
+                        System.out.println(s1 + " - " + s2 + ": " + (System.nanoTime() - time)/1E9 + " (Dijkstra)");
+                    }
+                    else {
+                        de = skand.AStar(i1, i2);
+                        System.out.println(s1 + " - " + s2 + ": " + (System.nanoTime() - time)/1E9 + " (A*)");
+                    }
+                    showPath(de, mapViewer);
+                    result.setText(timeString(de.getWeight()));
                 }
             }
         });
 
+        Dijkstra.onActionProperty().setValue(AStar.getOnAction());
+
         text1.onKeyPressedProperty().setValue(event -> {
             if (event.getCode().equals(KeyCode.ENTER)) {
-                button.fire();
+                AStar.fire();
             }
         });
         text2.onKeyPressedProperty().setValue(text1.getOnKeyPressed());
