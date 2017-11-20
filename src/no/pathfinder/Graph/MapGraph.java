@@ -35,7 +35,7 @@ public class MapGraph<T> extends Graph<GeographicCoordinate, T> {
     }
 
     private long heuristic(GeographicCoordinate g1, GeographicCoordinate g2) {
-        return (long) (3.272727272727272727 * g1.dist(g2)); // time to drive straight distance at 110km/h (x meters / (110 km/h) =* 3.273*x centiseconds)
+        return (long) (2.769230769230769 * g1.dist(g2)); // time to drive straight distance at 130km/h (x meters / (130 km/h) =* 2.769*x centiseconds)
     }
 
     /**
